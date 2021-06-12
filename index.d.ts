@@ -14,7 +14,7 @@ declare module 'launchdarkly-node-server-sdk-redis' {
    * Creates a feature store backed by a Redis instance.
    *
    * For more details about how and why you can use a persistent feature store, see
-   * the [SDK Reference Guide](https://docs.launchdarkly.com/v2.0/docs/using-a-persistent-feature-store).
+   * the [SDK features guide](https://docs.launchdarkly.com/sdk/features/database-integrations).
    *
    * @param redisOpts
    *   Optional configuration parameters to be passed to the `redis` package.
