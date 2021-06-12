@@ -6,6 +6,13 @@ import RedisFeatureStore from 'launchdarkly-node-server-sdk-redis';
 import { LDLogger } from 'launchdarkly-node-server-sdk';
 import * as redis from 'redis';
 
+var logger: ld.LDLogger = {
+  error: (...args) => { },
+  warn: (...args) => { },
+  info: (...args) => { },
+  debug: (...args) => { }
+};
+
 var redisStore0 = RedisFeatureStore();
 var myRedisOpts: redis.ClientOpts = {};
 var redisStore1 = RedisFeatureStore(myRedisOpts, 30, 'prefix', logger);
