@@ -1,5 +1,4 @@
 const redis = require('redis'),
-  winston = require('winston'),
   dataKind = require('launchdarkly-node-server-sdk/versioned_data_kind'),
   CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
 
