@@ -16,16 +16,18 @@ describe('RedisFeatureStore', () => {
 
   const extraRedisClient = redis.createClient(redisOpts);
 
+  const sdkConfig = { logger: stubLogger() };
+
   function makeCachedStore() {
-    return new RedisFeatureStore(redisOpts, 30, null, stubLogger());
+    return RedisFeatureStore(redisOpts, 30)(sdkConfig);
   }
 
   function makeUncachedStore() {
-    return new RedisFeatureStore(redisOpts, 0, null, stubLogger());
+    return RedisFeatureStore(redisOpts, 0)(sdkConfig);
   }
 
   function makeStoreWithPrefix(prefix) {
-    return new RedisFeatureStore(redisOpts, 0, prefix, stubLogger());
+    return RedisFeatureStore(redisOpts, 0, prefix)(sdkConfig);
   }
 
   function clearExistingData(callback) {
