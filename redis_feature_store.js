@@ -5,11 +5,17 @@ const redis = require('redis'),
 const noop = function() {};
 
 function RedisFeatureStore(redisOpts, cacheTTL, prefix, logger, preconfiguredClient) {
-  return new CachingStoreWrapper(
-    new redisFeatureStoreInternal(redisOpts || {}, prefix, logger, preconfiguredClient),
-    cacheTTL,
-    'Redis'
-  );
+  return config =>
+    new CachingStoreWrapper(
+      new redisFeatureStoreInternal(
+        redisOpts || {},
+        prefix,
+        logger || config.logger,
+        preconfiguredClient
+      ),
+      cacheTTL,
+      'Redis'
+    );
 }
 
 function nullLogger() {

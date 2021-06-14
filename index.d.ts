@@ -7,11 +7,11 @@
  */
 
 declare module 'launchdarkly-node-server-sdk-redis' {
-  import { LDFeatureStore, LDLogger } from 'launchdarkly-node-server-sdk';
+  import { LDFeatureStore, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
   import { ClientOpts, RedisClient } from 'redis';
 
   /**
-   * Creates a feature store backed by a Redis instance.
+   * Configures a feature store backed by a Redis instance.
    *
    * For more details about how and why you can use a persistent feature store, see
    * the [SDK features guide](https://docs.launchdarkly.com/sdk/features/database-integrations).
@@ -24,13 +24,15 @@ declare module 'launchdarkly-node-server-sdk-redis' {
    * @param prefix
    *   A string that should be prepended to all Redis keys used by the feature store.
    * @param logger
-   *   A custom logger for warnings and errors, if you are not using the default logger.
+   *   A custom logger for warnings and errors. If not specified, it will use whatever the
+   *   SDK's logging configuration is.
    * @param client
    *   Pass this parameter if you already have a Redis client instance that you wish to reuse. In this case,
    *   `redisOpts` will be ignored.
    *
    * @returns
-   *   An object to put in the `featureStore` property for [[LDOptions]].
+   *   A factory function that the SDK will use to create the data store. Put this value into the
+   *   `featureStore` property of [[LDOptions]].
    */
   export default function RedisFeatureStore(
     redisOpts?: ClientOpts,
@@ -38,5 +40,5 @@ declare module 'launchdarkly-node-server-sdk-redis' {
     prefix?: string,
     logger?: LDLogger | object,
     client?: RedisClient
-  ): LDFeatureStore;
+  ): (config: LDOptions) => LDFeatureStore;
 }
