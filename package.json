@@ -1,0 +1,50 @@
+{
+  "name": "launchdarkly-node-server-sdk-redis",
+  "version": "1.0.0",
+  "description": "Redis-backed feature store for the LaunchDarkly Node.js SDK",
+  "main": "redis_feature_store.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "jest --ci --forceExit",
+    "check-typescript": "node_modules/typescript/bin/tsc",
+    "lint": "eslint --format 'node_modules/eslint-formatter-pretty' --ignore-path .eslintignore ."
+  },
+  "types": "./index.d.ts",
+  "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "babel-jest": "^24.7.1",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-formatter-pretty": "^3.0.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^24.7.1",
+    "jest-junit": "^6.3.0",
+    "launchdarkly-js-test-helpers": "^1.0.0",
+    "launchdarkly-node-server-sdk": "^6.0.0-alpha.1",
+    "typescript": "^3.8.3"
+  },
+  "jest": {
+    "rootDir": ".",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*-test.js"
+    ],
+    "testResultsProcessor": "jest-junit",
+    "transformIgnorePatterns": []
+  },
+  "dependencies": {
+    "@types/redis": "^2.8.18",
+    "redis": "^3.1.1"
+  },
+  "peerDependencies": {
+    "launchdarkly-node-server-sdk": "^6.0.0-alpha.1"
+  },
+  "engines": {
+    "node": ">= 12.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/launchdarkly/node-server-sdk-redis/issues"
+  },
+  "homepage": "https://github.com/launchdarkly/node-server-sdk-redis"
+}
