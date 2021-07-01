@@ -2,7 +2,7 @@ const base = require('./redis_base');
 const { promisify } = require('util');
 
 function RedisBigSegmentStore(options) {
-  return config => bigSegmentStoreImpl(options, config.logger);
+  return config => bigSegmentStoreImpl(options || {}, config.logger);
   // Note, config.logger is guaranteed to be defined - the SDK will have provided a default one if necessary
 }
 
