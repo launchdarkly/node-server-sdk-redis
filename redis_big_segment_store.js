@@ -20,7 +20,7 @@ function bigSegmentStoreImpl(options, logger) {
 
   store.getMetadata = async () => {
     const value = await clientGet(prefix + ':big_segments_synchronized_on');
-    return { lastUpToDate: value ? parseInt(value) : undefined };
+    return { lastUpToDate: value === null || value === undefined || value === '' ? undefined : parseInt(value) };
   };
 
   store.getUserMembership = async userHash => {

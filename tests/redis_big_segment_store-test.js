@@ -21,7 +21,7 @@ describe('RedisBigSegmentStore', () => {
 
   async function setMetadata(prefix, metadata) {
     await promisify(client.set.bind(client))(prefix + ':big_segments_synchronized_on',
-        metadata.lastUpToDate ? metadata.lastUpToDate.toString() : '');
+      metadata.lastUpToDate ? metadata.lastUpToDate.toString() : '');
   }
 
   async function setSegments(prefix, userHashKey, includes, excludes) {
