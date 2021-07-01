@@ -1,60 +1,38 @@
-const redis = require('redis'),
-  dataKind = require('launchdarkly-node-server-sdk/versioned_data_kind'),
-  CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
+const base = require('./redis_base');
+const dataKind = require('launchdarkly-node-server-sdk/versioned_data_kind');
+const CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
 
 const noop = function() {};
 
-function RedisFeatureStore(redisOpts, cacheTTL, prefix, logger, preconfiguredClient) {
+function RedisFeatureStore(redisOpts, cacheTTL, prefix, logger, client) {
+  let options;
+  if (cacheTTL || prefix || logger || client) {
+    // convert from older syntax
+    options = { redisOpts, cacheTTL, prefix, client };
+  } else {
+    // first parameter could be either options (newer syntax) or redisOpts
+    options = redisOpts || {};
+    if (options.redisOpts === undefined && options.cacheTTL === undefined
+        && options.prefix === undefined && options.client === undefined) {
+      options = { redisOpts };
+    }
+  }
   return config =>
     new CachingStoreWrapper(
-      new redisFeatureStoreInternal(
-        redisOpts || {},
-        prefix,
-        logger || config.logger,
-        preconfiguredClient
-      ),
-      cacheTTL,
+      redisFeatureStoreInternal(options, logger || config.logger),
+      options.cacheTTL,
       'Redis'
     );
+  // Note, config.logger is guaranteed to be defined - the SDK will have provided a default one if necessary
 }
 
-function nullLogger() {
-  return {
-    debug: () => {},
-    info: () => {},
-    warn: () => {},
-    error: () => {}
-  };
-}
+function redisFeatureStoreInternal(options, logger) {
+  const state = base.initState(options, logger);
+  const client = state.client;
+  const itemsPrefix = state.prefix + ':';
+  const initedKey = itemsPrefix + '$inited';
 
-function redisFeatureStoreInternal(redisOpts, prefix, specifiedLogger, preconfiguredClient) {
-  const client = preconfiguredClient || redisOpts.client || redis.createClient(redisOpts),
-    store = {},
-    itemsPrefix = (prefix || 'launchdarkly') + ':',
-    initedKey = itemsPrefix + '$inited';
-
-  const logger = specifiedLogger || nullLogger();
-
-  let connected = !!redisOpts.client;
-  let initialConnect = !redisOpts.client;
-  client.on('error', err => {
-    // Note that we *must* have an error listener or else any connection error will trigger an
-    // uncaught exception.
-    logger.error('Redis error - ' + err);
-  });
-  client.on('reconnecting', info => {
-    logger.info('Attempting to reconnect to Redis (attempt #' + info.attempt + ', delay: ' + info.delay + 'ms)');
-  });
-  client.on('connect', () => {
-    if (!initialConnect) {
-      logger.warn('Reconnected to Redis');
-    }
-    initialConnect = false;
-    connected = true;
-  });
-  client.on('end', () => {
-    connected = false;
-  });
+  const store = {};
 
   function itemsKey(kind) {
     return itemsPrefix + kind.namespace;
@@ -64,7 +42,7 @@ function redisFeatureStoreInternal(redisOpts, prefix, specifiedLogger, preconfig
   function doGet(kind, key, maybeCallback) {
     const cb = maybeCallback || noop;
 
-    if (!connected && !initialConnect) {
+    if (!state.connected && !state.initialConnect) {
       logger.warn('Attempted to fetch key ' + key + ' while Redis connection is down');
       cb(null);
       return;
@@ -94,7 +72,7 @@ function redisFeatureStoreInternal(redisOpts, prefix, specifiedLogger, preconfig
 
   store.getAllInternal = (kind, maybeCallback) => {
     const cb = maybeCallback || noop;
-    if (!connected && !initialConnect) {
+    if (!state.connected && !state.initialConnect) {
       logger.warn('Attempted to fetch all keys while Redis connection is down');
       cb(null);
       return;
@@ -197,7 +175,9 @@ function redisFeatureStoreInternal(redisOpts, prefix, specifiedLogger, preconfig
   };
 
   store.close = () => {
-    client.quit();
+    if (state.stopClientOnClose) {
+      client.quit();
+    }
   };
 
   return store;

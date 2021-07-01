@@ -1,50 +1,37 @@
-const RedisFeatureStore = require('../redis_feature_store');
-const testBase = require('launchdarkly-node-server-sdk/test/feature_store_test_base');
+const { RedisFeatureStore } = require('../index');
+const { runPersistentFeatureStoreTests } = require('launchdarkly-node-server-sdk/sharedtest/store_tests');
 const redis = require('redis');
-
-function stubLogger() {
-  return {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-  };
-}
+const { promisify } = require('util');
 
 describe('RedisFeatureStore', () => {
   const redisOpts = { url: 'redis://localhost:6379' };
 
-  const extraRedisClient = redis.createClient(redisOpts);
+  const client = redis.createClient(redisOpts);
 
-  const sdkConfig = { logger: stubLogger() };
-
-  function makeCachedStore() {
-    return RedisFeatureStore(redisOpts, 30)(sdkConfig);
+  function createStore(prefix, cacheTTL, logger) {
+    return RedisFeatureStore({ redisOpts, cacheTTL, prefix })({ logger });
   }
 
-  function makeUncachedStore() {
-    return RedisFeatureStore(redisOpts, 0)(sdkConfig);
+  async function clearAllData(prefix) {
+    const keys = await promisify(client.keys.bind(client))(prefix + ':*');
+    for (const key of keys) {
+      await promisify(client.del.bind(client))(key);
+    }
   }
 
-  function makeStoreWithPrefix(prefix) {
-    return RedisFeatureStore(redisOpts, 0, prefix)(sdkConfig);
+  function createStoreWithConcurrentUpdateHook(prefix, logger, hook) {
+    const store = createStore(prefix, 0, logger);
+    store.underlyingStore.testUpdateHook = hook;
+    return store;
   }
 
-  function clearExistingData(callback) {
-    extraRedisClient.flushdb(callback);
-  }
-
-  testBase.baseFeatureStoreTests(makeCachedStore, clearExistingData, true);
-  testBase.baseFeatureStoreTests(makeUncachedStore, clearExistingData, false, makeStoreWithPrefix);
-
-  testBase.concurrentModificationTests(makeUncachedStore,
-    hook => {
-      const store = makeCachedStore();
-      store.underlyingStore.testUpdateHook = hook;
-      return store;
-    });
+  runPersistentFeatureStoreTests(
+    createStore,
+    clearAllData,
+    createStoreWithConcurrentUpdateHook,
+  );
 
   afterAll(() => {
-    extraRedisClient.quit();
+    client.quit();
   });
 });

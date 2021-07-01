@@ -24,13 +24,13 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
 3. Require the package:
 
-        var RedisFeatureStore = require('launchdarkly-node-server-sdk-redis');
+        const { RedisFeatureStore } = require('launchdarkly-node-server-sdk-redis');
 
 4. When configuring your SDK client, add the Redis feature store:
 
-        var store = RedisFeatureStore();
-        var config = { featureStore: store };
-        var client = LaunchDarkly.init('YOUR SDK KEY', config);
+        const store = RedisFeatureStore();
+        const config = { featureStore: store };
+        const client = LaunchDarkly.init('YOUR SDK KEY', config);
 
     By default, the store will try to connect to a local Redis instance on port 6379. You may specify an alternate configuration as described in the API documentation for `RedisFeatureStore`.
 
@@ -38,7 +38,7 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
 To reduce traffic to Redis, there is an optional in-memory cache that retains the last known data for a configurable amount of time. This is on by default; to turn it off (and guarantee that the latest feature flag data will always be retrieved from Redis for every flag evaluation), configure the store as follows:
 
-        var store = RedisFeatureStore({ cacheTTL: 0 });
+        const store = RedisFeatureStore({ cacheTTL: 0 });
 
 ## About LaunchDarkly
 
