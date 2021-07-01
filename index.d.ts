@@ -44,7 +44,7 @@ declare module 'launchdarkly-node-server-sdk-redis' {
    *   Optional configuration parameters to be passed to the `redis` package.
    * @param cacheTTL
    *   The amount of time, in seconds, that recently read or updated items should remain in an
-   *   in-memory cache. If it is zero, there will be no in-memory caching. The default value is DefaultCacheTTL.
+   *   in-memory cache. If it is zero, there will be no in-memory caching.
    * @param prefix
    *   A string that should be prepended to all Redis keys used by the feature store.
    * @param logger
@@ -108,6 +108,10 @@ declare module 'launchdarkly-node-server-sdk-redis' {
     /**
      * The amount of time, in seconds, that recently read or updated items should remain in an
      * in-memory cache. If it is zero, there will be no in-memory caching.
+     * 
+     * This parameter applies only to [[RedisFeatureStore]]. It is ignored for [[RedisBigSegmentStore]].
+     * Caching for [[RedisBigSegmentStore]] is configured separately, in the SDK's
+     * `LDBigSegmentsOptions` type, since it is independent of what database implementation is used.
      */
     cacheTTL?: number
   }
