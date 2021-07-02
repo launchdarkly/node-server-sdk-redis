@@ -1,9 +1,13 @@
 const { RedisBigSegmentStore, RedisFeatureStore } = require('../index');
 const { keyLastUpToDate, keyUserInclude, keyUserExclude } = require('../redis_big_segment_store');
-const { runPersistentFeatureStoreTests } = require('launchdarkly-node-server-sdk/sharedtest/store_tests');
-const { runBigSegmentStoreTests } = require('launchdarkly-node-server-sdk/sharedtest/store_tests');
+const {
+  runPersistentFeatureStoreTests,
+  runBigSegmentStoreTests,
+} = require('launchdarkly-node-server-sdk/sharedtest/store_tests');
 const redis = require('redis');
 const { promisify } = require('util');
+
+// Runs the standard test suites provided by the SDK's store_tests module.
 
 // This is a single file because if the two test suites were run from separate files, they could
 // be interleaved by Jest. Since our implementation of clearAllData is not very smart and will
