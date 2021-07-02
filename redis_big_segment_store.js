@@ -1,6 +1,10 @@
 const base = require('./redis_base');
 const { promisify } = require('util');
 
+const keyLastUpToDate = 'big_segments_synchronized_on';
+const keyUserInclude = 'big_segment_include:';
+const keyUserExclude = 'big_segment_exclude:';
+
 function RedisBigSegmentStore(options) {
   return config => bigSegmentStoreImpl(options || {}, config.logger);
   // Note, config.logger is guaranteed to be defined - the SDK will have provided a default one if necessary
@@ -19,13 +23,13 @@ function bigSegmentStoreImpl(options, logger) {
   const clientSmembers = promisify(client.smembers.bind(client));
 
   store.getMetadata = async () => {
-    const value = await clientGet(prefix + ':big_segments_synchronized_on');
+    const value = await clientGet(prefix + keyLastUpToDate);
     return { lastUpToDate: value === null || value === undefined || value === '' ? undefined : parseInt(value) };
   };
 
   store.getUserMembership = async userHash => {
-    const includedRefs = await promisify(clientSmembers)(prefix + ':big_segment_include:' + userHash);
-    const excludedRefs = await promisify(clientSmembers)(prefix + ':big_segment_exclude:' + userHash);
+    const includedRefs = await promisify(clientSmembers)(prefix + keyUserInclude + userHash);
+    const excludedRefs = await promisify(clientSmembers)(prefix + keyUserExclude + userHash);
     if ((!includedRefs || !includedRefs.length) && (!excludedRefs || !excludedRefs.length)) {
       return null;
     }
@@ -52,4 +56,10 @@ function bigSegmentStoreImpl(options, logger) {
   return store;
 }
 
-module.exports = RedisBigSegmentStore;
+module.exports = {
+  RedisBigSegmentStore,
+  keyLastUpToDate,
+  keyUserInclude,
+  keyUserExclude,
+};
+

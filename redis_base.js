@@ -4,7 +4,7 @@ const defaultPrefix = 'launchdarkly';
 
 function initState(options, logger) {
   const state = {
-    prefix: options.prefix || defaultPrefix
+    prefix: (options.prefix || defaultPrefix) + ':',
   };
 
   if (options.client) {

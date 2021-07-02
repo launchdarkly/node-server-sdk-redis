@@ -29,7 +29,7 @@ function RedisFeatureStore(redisOpts, cacheTTL, prefix, logger, client) {
 function redisFeatureStoreInternal(options, logger) {
   const state = base.initState(options, logger);
   const client = state.client;
-  const itemsPrefix = state.prefix + ':';
+  const itemsPrefix = state.prefix;
   const initedKey = itemsPrefix + '$inited';
 
   const store = {};
