@@ -4,7 +4,7 @@
 
 This library provides a Redis-backed persistence mechanism (feature store) for the [LaunchDarkly Node.js SDK](https://github.com/launchdarkly/node-server-sdk), replacing the default in-memory feature store. The underlying Redis client implementation is [Node Redis](https://www.npmjs.com/package/redis).
 
-The minimum version of the LaunchDarkly Server-Side SDK for Node for use with this library is 6.0.0. In earlier versions of the SDK, the Redis integration was bundled in the main SDK package.
+The minimum version of the LaunchDarkly Server-Side SDK for Node for use with this library is 6.2.0. In earlier versions of the SDK, the Redis integration was bundled in the main SDK package.
 
 For more information, see the [SDK features guide](https://docs.launchdarkly.com/sdk/features/database-integrations).
 
