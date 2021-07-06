@@ -2,38 +2,32 @@
   "name": "launchdarkly-node-server-sdk-redis",
   "version": "1.0.0",
   "description": "Redis-backed feature store for the LaunchDarkly Node.js SDK",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "license": "Apache-2.0",
   "scripts": {
+    "prepublish": "npm run build",
+    "build": "tsc",
     "test": "jest --ci",
-    "check-typescript": "node_modules/typescript/bin/tsc",
-    "lint": "eslint --format 'node_modules/eslint-formatter-pretty' --ignore-path .eslintignore ."
+    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'"
   },
-  "types": "./index.d.ts",
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.5",
+    "@types/jest": "^26.0.23",
     "@types/node": "^15.12.2",
     "babel-jest": "^27.0.2",
     "eslint": "^7.28.0",
-    "eslint-config-prettier": "^8.3.0",
     "eslint-formatter-pretty": "^4.1.0",
-    "eslint-plugin-prettier": "^3.4.0",
     "jest": "^27.0.4",
     "jest-junit": "^12.2.0",
     "launchdarkly-js-test-helpers": "^1.2.1",
     "launchdarkly-node-server-sdk": "6.2.0-alpha.bigsegments.3",
     "prettier": "^2.3.1",
+    "ts-jest": "^27.0.0",
+    "tslint": "^5.20.1",
     "typescript": "^4.3.2"
-  },
-  "jest": {
-    "rootDir": ".",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/*-test.js"
-    ],
-    "testResultsProcessor": "jest-junit",
-    "transformIgnorePatterns": []
   },
   "dependencies": {
     "@types/redis": "^2.8.18",
