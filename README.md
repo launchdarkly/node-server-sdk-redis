@@ -4,7 +4,7 @@
 
 This library provides a Redis-backed persistence mechanism (feature store) for the [LaunchDarkly Node.js SDK](https://github.com/launchdarkly/node-server-sdk), replacing the default in-memory feature store. The underlying Redis client implementation is [Node Redis](https://www.npmjs.com/package/redis).
 
-The minimum version of the LaunchDarkly Server-Side SDK for Node for use with this library is 6.0.0. In earlier versions of the SDK, the Redis integration was bundled in the main SDK package.
+The minimum version of the LaunchDarkly Server-Side SDK for Node for use with this library is 6.2.0. In earlier versions of the SDK, the Redis integration was bundled in the main SDK package.
 
 For more information, see the [SDK features guide](https://docs.launchdarkly.com/sdk/features/database-integrations).
 
@@ -24,13 +24,13 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
 3. Require the package:
 
-        var RedisFeatureStore = require('launchdarkly-node-server-sdk-redis');
+        const { RedisFeatureStore } = require('launchdarkly-node-server-sdk-redis');
 
 4. When configuring your SDK client, add the Redis feature store:
 
-        var store = RedisFeatureStore();
-        var config = { featureStore: store };
-        var client = LaunchDarkly.init('YOUR SDK KEY', config);
+        const store = RedisFeatureStore();
+        const config = { featureStore: store };
+        const client = LaunchDarkly.init('YOUR SDK KEY', config);
 
     By default, the store will try to connect to a local Redis instance on port 6379. You may specify an alternate configuration as described in the API documentation for `RedisFeatureStore`.
 
@@ -38,7 +38,7 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
 To reduce traffic to Redis, there is an optional in-memory cache that retains the last known data for a configurable amount of time. This is on by default; to turn it off (and guarantee that the latest feature flag data will always be retrieved from Redis for every flag evaluation), configure the store as follows:
 
-        var store = RedisFeatureStore({ cacheTTL: 0 });
+        const store = RedisFeatureStore({ cacheTTL: 0 });
 
 ## About LaunchDarkly
 
