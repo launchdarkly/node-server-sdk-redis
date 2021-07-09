@@ -11,7 +11,7 @@ import {
 import { createClient, RedisClient } from "redis";
 import { promisify } from "util";
 
-// Runs the standard test suites provided by the SDK"s store_tests module.
+// Runs the standard test suites provided by the SDK's store_tests module.
 
 // This is a single file because if the two test suites were run from separate files, they could
 // be interleaved by Jest. Since our implementation of clearAllData is not very smart and will

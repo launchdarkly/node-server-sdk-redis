@@ -16,7 +16,7 @@ export const keyUserExclude = "big_segment_exclude:";
  * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users
  *
  * @param options The standard options supported for all LaunchDarkly Redis features, including both
- *   options for Redis itself and others related to the SDK"s behavior.
+ *   options for Redis itself and others related to the SDK's behavior.
  */
 export function RedisBigSegmentStore(options?: LDRedisOptions):
     (config: ld.LDOptions) => ld.interfaces.BigSegmentStore {

@@ -58,8 +58,9 @@ interface FullDataSet {
  * @param prefix
  *   A string that should be prepended to all Redis keys used by the feature store.
  * @param logger
- *   A custom logger for warnings and errors. If not specified, it will use whatever the
- *   SDK"s logging configuration is.
+ *   A custom logger for warnings and errors. Setting the logger in this way is deprecated; you
+ *   should omit it, which will cause the store to simply use whatever's the SDK's logging
+ *   configuration is.
  * @param client
  *   Pass this parameter if you already have a Redis client instance that you wish to reuse. In this case,
  *   `redisOpts` will be ignored.
