@@ -1,4 +1,5 @@
 import { BaseRedis } from "./base";
+import { DataKind, FullDataSet, KeyedItems, VersionedData } from "./feature_store_types";
 import { LDRedisOptions } from "./options";
 
 import * as ld from "launchdarkly-node-server-sdk";
@@ -6,28 +7,6 @@ import * as CachingStoreWrapper from "launchdarkly-node-server-sdk/caching_store
 import * as dataKind from "launchdarkly-node-server-sdk/versioned_data_kind";
 
 import { ClientOpts, RedisClient } from "redis";
-
-// Here we're declaring some interfaces that the SDK doesn't currently export for the
-// internal persistent data store API - currently it declares them as "object" or "any".
-// In the future, these should be defined in the SDK's types.
-
-interface DataKind {
-  namespace: string;
-}
-
-interface VersionedData {
-  key: string;
-  version: number;
-  deleted?: boolean;
-}
-
-interface KeyedItems {
-  [name: string]: VersionedData;
-}
-
-interface FullDataSet {
-  [namespace: string]: KeyedItems;
-}
 
 /**
  * Configures a feature store backed by a Redis instance.
