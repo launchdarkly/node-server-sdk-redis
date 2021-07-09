@@ -7,14 +7,22 @@ import * as dataKind from "launchdarkly-node-server-sdk/versioned_data_kind";
 
 import { ClientOpts, RedisClient } from "redis";
 
-// Here we"re declaring some interfaces that the SDK doesn"t currently export for the
-// internal persistent data store API - currently it declares them only as "object"
+// Here we're declaring some interfaces that the SDK doesn't currently export for the
+// internal persistent data store API - currently it declares them as "object" or "any".
+// In the future, these should be defined in the SDK's types.
+
 interface DataKind {
   namespace: string;
 }
 
+interface VersionedData {
+  key: string;
+  version: number;
+  deleted?: boolean;
+}
+
 interface KeyedItems {
-  [name: string]: object;
+  [name: string]: VersionedData;
 }
 
 interface FullDataSet {
@@ -115,7 +123,7 @@ export class RedisFeatureStoreImpl {
     this.initedKey = this.prefix + "$inited";
   }
 
-  public getInternal(kind: DataKind, key: string, callback: (item: any) => void): void {
+  public getInternal(kind: DataKind, key: string, callback: (item?: VersionedData) => void): void {
     this.doGet(kind, key, (item) => {
       if (item && !item.deleted) {
         callback(item);
@@ -140,7 +148,7 @@ export class RedisFeatureStoreImpl {
         const results = {};
         const items = obj;
         for (const [key, serializedData] of Object.entries(items)) {
-          results[key] = JSON.parse(serializedData);
+          results[key] = JSON.parse(serializedData) as VersionedData;
         }
         callback(results);
       }
@@ -174,7 +182,8 @@ export class RedisFeatureStoreImpl {
     });
   }
 
-  public upsertInternal(kind: DataKind, item: any, callback: (err: Error, finalItem: any) => void): void {
+  public upsertInternal(kind: DataKind, item: VersionedData,
+                        callback: (err: Error, finalItem: VersionedData) => void): void {
     this.updateItemWithVersioning(kind, item, (err, attemptedWrite) => {
       if (err) {
         this.logger.error(`Error upserting key ${item.key} in "${kind.namespace}"`, err); // eslint-disable-line quotes
@@ -199,7 +208,7 @@ export class RedisFeatureStoreImpl {
     return this.prefix + kind.namespace;
   }
 
-  private doGet(kind: DataKind, key: string, callback: (item: any) => void): void {
+  private doGet(kind: DataKind, key: string, callback: (item?: VersionedData) => void): void {
     if (!this.state.connected && !this.state.initialConnect) {
       this.logger.warn(`Attempted to fetch key "${key}" while Redis connection is down`);
       callback(null);
@@ -211,13 +220,14 @@ export class RedisFeatureStoreImpl {
         this.logger.error(`Error fetching key "${key}" from Redis in "${kind.namespace}"`, err);
         callback(null);
       } else {
-        const item = JSON.parse(obj);
+        const item = JSON.parse(obj) as VersionedData;
         callback(item);
       }
     });
   }
 
-  private updateItemWithVersioning(kind: DataKind, newItem: any, callback: (err: Error, finalItem: any) => void): void {
+  private updateItemWithVersioning(kind: DataKind, newItem: VersionedData,
+                                   callback: (err: Error, finalItem: VersionedData) => void): void {
     this.client.watch(this.itemsKey(kind));
     const multi = this.client.multi();
     // testUpdateHook is instrumentation, used only by the unit tests

@@ -3,7 +3,7 @@ import { LDRedisOptions } from "./options";
 import { LDLogger } from "launchdarkly-node-server-sdk";
 import * as redis from "redis";
 
-const defaultPrefix = "launchdarkly";
+export const defaultPrefix = "launchdarkly";
 
 export class BaseRedis {
   public prefix: string;
@@ -27,9 +27,9 @@ export class BaseRedis {
 
     this.initialConnect = !this.connected;
 
-    // The reason we"re attaching event handlers here to keep track of the connection state is that
+    // The reason we're attaching event handlers here to keep track of the connection state is that
     // if we give a command to the Redis client while the connection is down, rather than simply
-    // failing it may decide to defer the command until the connection is up again. We don"t want
+    // failing it may decide to defer the command until the connection is up again. We don't want
     // to leave these operations hanging; we would rather fail fast. So we need to know if the
     // client is currently offline so we can avoid trying to do commands then.
 

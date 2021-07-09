@@ -1,3 +1,4 @@
+import { defaultPrefix } from "../src/base";
 import { keyLastUpToDate, keyUserExclude, keyUserInclude } from "../src/big_segment_store";
 import { RedisFeatureStoreImpl } from "../src/feature_store";
 import { RedisBigSegmentStore, RedisFeatureStore } from "../src/index";
@@ -20,7 +21,8 @@ import { promisify } from "util";
 
 function clearAllData(client: RedisClient) {
   return async (prefix: string) => {
-    const keys = await promisify(client.keys.bind(client))(prefix + ":*");
+    const realPrefix = prefix ?? defaultPrefix;
+    const keys = await promisify(client.keys.bind(client))(realPrefix + ":*");
     for (const key of keys) {
       await promisify(client.del.bind(client))(key);
     }
@@ -67,16 +69,18 @@ describe("RedisBigSegmentStore", () => {
   }
 
   async function setMetadata(prefix: string, metadata: ld.interfaces.BigSegmentStoreMetadata) {
-    await promisify(client.set.bind(client))(prefix + ":" + keyLastUpToDate,
+    const realPrefix = prefix ?? defaultPrefix;
+    await promisify(client.set.bind(client))(realPrefix + ":" + keyLastUpToDate,
       metadata.lastUpToDate ? metadata.lastUpToDate.toString() : "");
   }
 
   async function setSegments(prefix: string, userHashKey: string, includes: string[], excludes: string[]) {
+    const realPrefix = prefix ?? defaultPrefix;
     for (const ref of includes) {
-      await promisify(client.sadd.bind(client))(prefix + ":" + keyUserInclude + userHashKey, ref);
+      await promisify(client.sadd.bind(client))(realPrefix + ":" + keyUserInclude + userHashKey, ref);
     }
     for (const ref of excludes) {
-      await promisify(client.sadd.bind(client))(prefix + ":" + keyUserExclude + userHashKey, ref);
+      await promisify(client.sadd.bind(client))(realPrefix + ":" + keyUserExclude + userHashKey, ref);
     }
   }
 
