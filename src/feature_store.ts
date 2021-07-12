@@ -1,12 +1,12 @@
-import { BaseRedis } from "./base";
-import { DataKind, FullDataSet, KeyedItems, VersionedData } from "./feature_store_types";
-import { LDRedisOptions } from "./options";
+import { BaseRedis } from './base';
+import { DataKind, FullDataSet, KeyedItems, VersionedData } from './feature_store_types';
+import { LDRedisOptions } from './options';
 
-import * as ld from "launchdarkly-node-server-sdk";
-import * as CachingStoreWrapper from "launchdarkly-node-server-sdk/caching_store_wrapper";
-import * as dataKind from "launchdarkly-node-server-sdk/versioned_data_kind";
+import * as ld from 'launchdarkly-node-server-sdk';
+import * as CachingStoreWrapper from 'launchdarkly-node-server-sdk/caching_store_wrapper';
+import * as dataKind from 'launchdarkly-node-server-sdk/versioned_data_kind';
 
-import { ClientOpts, RedisClient } from "redis";
+import { ClientOpts, RedisClient } from 'redis';
 
 /**
  * Configures a feature store backed by a Redis instance.
@@ -21,8 +21,8 @@ import { ClientOpts, RedisClient } from "redis";
  * ```
  * const store = RedisFeatureStore(
  *   {
- *     redisOpts: { host: "redishost", port: 6379 },
- *     prefix: "app1",
+ *     redisOpts: { host: 'redishost', port: 6379 },
+ *     prefix: 'app1',
  *     cacheTTL: 30
  *   });
  * ```
@@ -31,9 +31,9 @@ import { ClientOpts, RedisClient } from "redis";
  *
  * ```
  * const store = RedisFeatureStore(
- *   { host: "redishost", port: 6379 },
+ *   { host: 'redishost', port: 6379 },
  *   30,
- *   "app1"
+ *   'app1'
  * );
  * ```
  *
@@ -80,7 +80,7 @@ export function RedisFeatureStore(
     new CachingStoreWrapper(
       new RedisFeatureStoreImpl(options, logger || config.logger),
       options.cacheTTL,
-      "Redis",
+      'Redis',
     );
   // Note, config.logger is guaranteed to be defined - the SDK will have provided a default one if necessary
 }
@@ -99,7 +99,7 @@ export class RedisFeatureStoreImpl {
     this.client = this.state.client;
     this.logger = logger;
     this.prefix = this.state.prefix;
-    this.initedKey = this.prefix + "$inited";
+    this.initedKey = this.prefix + '$inited';
   }
 
   public getInternal(kind: DataKind, key: string, callback: (item?: VersionedData) => void): void {
@@ -114,14 +114,14 @@ export class RedisFeatureStoreImpl {
 
   public getAllInternal(kind: DataKind, callback: (items: KeyedItems) => void): void {
     if (!this.state.connected && !this.state.initialConnect) {
-      this.logger.warn("Attempted to fetch all keys while Redis connection is down");
+      this.logger.warn('Attempted to fetch all keys while Redis connection is down');
       callback(null);
       return;
     }
 
     this.client.hgetall(this.itemsKey(kind), (err, obj) => {
       if (err) {
-        this.logger.error(`Error fetching "${kind.namespace}" from Redis`, err);
+        this.logger.error(`Error fetching '${kind.namespace}' from Redis`, err);
         callback(null);
       } else {
         const results = {};
@@ -151,21 +151,24 @@ export class RedisFeatureStoreImpl {
       }
     }
 
-    multi.set(this.initedKey, "");
+    multi.set(this.initedKey, '');
 
     multi.exec((err) => {
       if (err) {
-        this.logger.error("Error initializing Redis store", err);
+        this.logger.error('Error initializing Redis store', err);
       }
       callback();
     });
   }
 
-  public upsertInternal(kind: DataKind, item: VersionedData,
-                        callback: (err: Error, finalItem: VersionedData) => void): void {
+  public upsertInternal(
+    kind: DataKind,
+    item: VersionedData,
+    callback: (err: Error, finalItem: VersionedData) => void,
+  ): void {
     this.updateItemWithVersioning(kind, item, (err, attemptedWrite) => {
       if (err) {
-        this.logger.error(`Error upserting key ${item.key} in "${kind.namespace}"`, err); // eslint-disable-line quotes
+        this.logger.error(`Error upserting key ${item.key} in '${kind.namespace}'`, err); // eslint-disable-line quotes
       }
       callback(err, attemptedWrite);
     });
@@ -177,7 +180,7 @@ export class RedisFeatureStoreImpl {
     });
   }
 
-  public close() {
+  public close(): void {
     if (this.state.stopClientOnClose) {
       this.client.quit();
     }
@@ -189,14 +192,14 @@ export class RedisFeatureStoreImpl {
 
   private doGet(kind: DataKind, key: string, callback: (item?: VersionedData) => void): void {
     if (!this.state.connected && !this.state.initialConnect) {
-      this.logger.warn(`Attempted to fetch key "${key}" while Redis connection is down`);
+      this.logger.warn(`Attempted to fetch key '${key}' while Redis connection is down`);
       callback(null);
       return;
     }
 
     this.client.hget(this.itemsKey(kind), key, (err, obj) => {
       if (err) {
-        this.logger.error(`Error fetching key "${key}" from Redis in "${kind.namespace}"`, err);
+        this.logger.error(`Error fetching key '${key}' from Redis in '${kind.namespace}'`, err);
         callback(null);
       } else {
         const item = JSON.parse(obj) as VersionedData;
@@ -205,8 +208,11 @@ export class RedisFeatureStoreImpl {
     });
   }
 
-  private updateItemWithVersioning(kind: DataKind, newItem: VersionedData,
-                                   callback: (err: Error, finalItem: VersionedData) => void): void {
+  private updateItemWithVersioning(
+    kind: DataKind,
+    newItem: VersionedData,
+    callback: (err: Error, finalItem: VersionedData) => void,
+  ): void {
     this.client.watch(this.itemsKey(kind));
     const multi = this.client.multi();
     // testUpdateHook is instrumentation, used only by the unit tests
@@ -223,7 +229,7 @@ export class RedisFeatureStoreImpl {
           multi.exec((err, replies) => {
             if (!err && replies === null) {
               // This means the EXEC failed because someone modified the watched key
-              this.logger.debug("Concurrent modification detected, retrying");
+              this.logger.debug('Concurrent modification detected, retrying');
               this.updateItemWithVersioning(kind, newItem, callback);
             } else {
               callback(err, newItem);

@@ -1,9 +1,9 @@
-import { LDRedisOptions } from "./options";
+import { LDRedisOptions } from './options';
 
-import { LDLogger } from "launchdarkly-node-server-sdk";
-import * as redis from "redis";
+import { LDLogger } from 'launchdarkly-node-server-sdk';
+import * as redis from 'redis';
 
-export const defaultPrefix = "launchdarkly";
+export const defaultPrefix = 'launchdarkly';
 
 export class BaseRedis {
   public prefix: string;
@@ -13,7 +13,7 @@ export class BaseRedis {
   public initialConnect: boolean;
 
   public constructor(options: LDRedisOptions, logger: LDLogger) {
-    this.prefix = (options.prefix || defaultPrefix) + ":";
+    this.prefix = (options.prefix || defaultPrefix) + ':';
 
     if (options.client) {
       this.client = options.client;
@@ -33,25 +33,25 @@ export class BaseRedis {
     // to leave these operations hanging; we would rather fail fast. So we need to know if the
     // client is currently offline so we can avoid trying to do commands then.
 
-    this.client.on("error", (err) => {
+    this.client.on('error', (err) => {
       // Note that we *must* have an error listener or else any connection error will trigger an
       // uncaught exception.
-      logger.error("Redis error - " + err);
+      logger.error(`Redis error - ${err}`);
     });
 
-    this.client.on("reconnecting", (info) => {
-      logger.info("Attempting to reconnect to Redis (attempt #" + info.attempt + ", delay: " + info.delay + "ms)");
+    this.client.on('reconnecting', (info) => {
+      logger.info(`Attempting to reconnect to Redis (attempt #${info.attempt}, delay: ${info.delay}ms)`);
     });
 
-    this.client.on("connect", () => {
+    this.client.on('connect', () => {
       if (!this.initialConnect) {
-        logger.warn("Reconnected to Redis");
+        logger.warn('Reconnected to Redis');
       }
       this.initialConnect = false;
       this.connected = true;
     });
 
-    this.client.on("end", () => {
+    this.client.on('end', () => {
       this.connected = false;
     });
   }

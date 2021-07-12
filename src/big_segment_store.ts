@@ -1,13 +1,13 @@
-import { BaseRedis } from "./base";
-import { LDRedisOptions } from "./options";
+import { BaseRedis } from './base';
+import { LDRedisOptions } from './options';
 
-import * as ld from "launchdarkly-node-server-sdk";
-import { RedisClient } from "redis";
-import { promisify } from "util";
+import * as ld from 'launchdarkly-node-server-sdk';
+import { RedisClient } from 'redis';
+import { promisify } from 'util';
 
-export const keyLastUpToDate = "big_segments_synchronized_on";
-export const keyUserInclude = "big_segment_include:";
-export const keyUserExclude = "big_segment_exclude:";
+export const keyLastUpToDate = 'big_segments_synchronized_on';
+export const keyUserInclude = 'big_segment_include:';
+export const keyUserExclude = 'big_segment_exclude:';
 
 /**
  * Configures a big segment store backed by a Redis instance.
@@ -44,7 +44,7 @@ class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
   public async getMetadata(): Promise<ld.interfaces.BigSegmentStoreMetadata> {
     const value = await this.clientGet(this.prefix + keyLastUpToDate);
     return {
-      lastUpToDate: value === null || value === undefined || value === "" ? undefined : parseInt(value, 10),
+      lastUpToDate: value === null || value === undefined || value === '' ? undefined : parseInt(value, 10),
     };
   }
 

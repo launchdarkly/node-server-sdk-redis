@@ -1,4 +1,4 @@
-import { ClientOpts, RedisClient } from "redis";
+import { ClientOpts, RedisClient } from 'redis';
 
 /**
  * The standard options supported for the LaunchDarkly Redis integration.

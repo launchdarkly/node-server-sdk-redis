@@ -3,3 +3,4 @@ package-lock.json
 junit.xml
 test-types.js
 dist/
+.eslintcache
