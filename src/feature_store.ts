@@ -90,14 +90,12 @@ export class RedisFeatureStoreImpl {
 
   private state: BaseRedis;
   private client: RedisClient;
-  private logger: ld.LDLogger;
   private prefix: string;
   private initedKey: string;
 
-  public constructor(options: LDRedisOptions, logger: ld.LDLogger) {
+  public constructor(options: LDRedisOptions, public logger: ld.LDLogger) {
     this.state = new BaseRedis(options, logger);
     this.client = this.state.client;
-    this.logger = logger;
     this.prefix = this.state.prefix;
     this.initedKey = this.prefix + '$inited';
   }
