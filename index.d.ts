@@ -8,7 +8,7 @@
 
 declare module 'launchdarkly-node-server-sdk-redis' {
   import { LDFeatureStore, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
-  import * as ld from 'launchdarkly-node-server-sdk';
+  import { BigSegmentStore } from 'launchdarkly-node-server-sdk/interfaces';
   import { ClientOpts, RedisClient } from 'redis';
 
   /**
@@ -77,7 +77,7 @@ declare module 'launchdarkly-node-server-sdk-redis' {
    */
   export function RedisBigSegmentStore(
     options?: LDRedisOptions
-  ): (config: LDOptions) => ld.interfaces.BigSegmentStore;
+  ): (config: LDOptions) => BigSegmentStore;
 
   /**
    * The standard options supported for the LaunchDarkly Redis integration.
