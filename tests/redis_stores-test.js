@@ -7,6 +7,8 @@ const {
 const redis = require('redis');
 const { promisify } = require('util');
 
+const defaultPrefix = 'launchdarkly';
+
 // Runs the standard test suites provided by the SDK's store_tests module.
 
 // This is a single file because if the two test suites were run from separate files, they could
@@ -14,9 +16,13 @@ const { promisify } = require('util');
 // remove *all* keys with the given prefix, we could step on another test's data if the shared
 // test suites happen to use the same prefix.
 
+function actualPrefix(prefix) {
+  return prefix || defaultPrefix;
+}
+
 function clearAllData(client) {
   return async prefix => {
-    const keys = await promisify(client.keys.bind(client))(prefix + ':*');
+    const keys = await promisify(client.keys.bind(client))(actualPrefix(prefix) + ':*');
     for (const key of keys) {
       await promisify(client.del.bind(client))(key);
     }
@@ -59,16 +65,16 @@ describe('RedisBigSegmentStore', () => {
   }
 
   async function setMetadata(prefix, metadata) {
-    await promisify(client.set.bind(client))(prefix + ':' + keyLastUpToDate,
+    await promisify(client.set.bind(client))(actualPrefix(prefix) + ':' + keyLastUpToDate,
       metadata.lastUpToDate ? metadata.lastUpToDate.toString() : '');
   }
 
   async function setSegments(prefix, userHashKey, includes, excludes) {
     for (const ref of includes) {
-      await promisify(client.sadd.bind(client))(prefix + ':' + keyUserInclude + userHashKey, ref);
+      await promisify(client.sadd.bind(client))(actualPrefix(prefix) + ':' + keyUserInclude + userHashKey, ref);
     }
     for (const ref of excludes) {
-      await promisify(client.sadd.bind(client))(prefix + ':' + keyUserExclude + userHashKey, ref);
+      await promisify(client.sadd.bind(client))(actualPrefix(prefix) + ':' + keyUserExclude + userHashKey, ref);
     }
   }
 
