@@ -32,4 +32,8 @@ To run all unit tests:
 npm test
 ```
 
-The tests expect you to have Redis running locally on the default port, 6379. One way to do this is with Docker: `docker run -d -p 6379:6379 redis`
+The tests expect you to have Redis running locally on the default port, 6379. One way to do this is with Docker:
+
+```
+docker run -p 6379:6379 redis
+```
