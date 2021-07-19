@@ -3,7 +3,8 @@ import { keyLastUpToDate, keyUserExclude, keyUserInclude } from '../src/big_segm
 import { RedisFeatureStoreImpl } from '../src/feature_store';
 import { RedisBigSegmentStore, RedisFeatureStore } from '../src/index';
 
-import * as ld from 'launchdarkly-node-server-sdk';
+import { LDLogger } from 'launchdarkly-node-server-sdk';
+import { BigSegmentStoreMetadata } from 'launchdarkly-node-server-sdk/interfaces';
 import {
   runBigSegmentStoreTests,
   runPersistentFeatureStoreTests,
@@ -34,13 +35,13 @@ describe('RedisFeatureStore', () => {
 
   const client = createClient(redisOpts);
 
-  function createStore(prefix: string, cacheTTL: number, logger: ld.LDLogger) {
+  function createStore(prefix: string, cacheTTL: number, logger: LDLogger) {
     return RedisFeatureStore({ redisOpts, cacheTTL, prefix })({ logger });
   }
 
   function createStoreWithConcurrentUpdateHook(
     prefix: string,
-    logger: ld.LDLogger,
+    logger: LDLogger,
     hook: (callback: () => void) => void,
   ) {
     const store = createStore(prefix, 0, logger);
@@ -70,11 +71,11 @@ describe('RedisBigSegmentStore', () => {
 
   const client = createClient(redisOpts);
 
-  function createStore(prefix: string, logger: ld.LDLogger) {
+  function createStore(prefix: string, logger: LDLogger) {
     return RedisBigSegmentStore({ redisOpts, prefix })({ logger });
   }
 
-  async function setMetadata(prefix: string, metadata: ld.interfaces.BigSegmentStoreMetadata) {
+  async function setMetadata(prefix: string, metadata: BigSegmentStoreMetadata) {
     const realPrefix = prefix ?? defaultPrefix;
     await promisify(client.set.bind(client))(realPrefix + ':' + keyLastUpToDate,
       metadata.lastUpToDate ? metadata.lastUpToDate.toString() : '');

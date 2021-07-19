@@ -2,8 +2,8 @@ import { BaseRedis } from './base';
 import { DataKind, FullDataSet, KeyedItems, VersionedData } from './feature_store_types';
 import { LDRedisOptions } from './options';
 
-import * as ld from 'launchdarkly-node-server-sdk';
-import * as CachingStoreWrapper from 'launchdarkly-node-server-sdk/caching_store_wrapper';
+import { LDFeatureStore, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
+import CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
 import * as dataKind from 'launchdarkly-node-server-sdk/versioned_data_kind';
 
 import { ClientOpts, RedisClient } from 'redis';
@@ -61,9 +61,9 @@ export function RedisFeatureStore(
   redisOpts?: ClientOpts | LDRedisOptions,
   cacheTTL?: number,
   prefix?: string,
-  logger?: ld.LDLogger,
+  logger?: LDLogger,
   client?: RedisClient,
-): (config: ld.LDOptions) => ld.LDFeatureStore {
+): (config: LDOptions) => LDFeatureStore {
   let options: LDRedisOptions;
   if (cacheTTL || prefix || logger || client) {
     // convert from older syntax
@@ -93,7 +93,7 @@ export class RedisFeatureStoreImpl {
   private prefix: string;
   private initedKey: string;
 
-  public constructor(options: LDRedisOptions, public logger: ld.LDLogger) {
+  public constructor(options: LDRedisOptions, public logger: LDLogger) {
     this.state = new BaseRedis(options, logger);
     this.client = this.state.client;
     this.prefix = this.state.prefix;

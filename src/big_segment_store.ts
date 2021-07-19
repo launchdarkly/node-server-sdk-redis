@@ -1,7 +1,9 @@
 import { BaseRedis } from './base';
 import { LDRedisOptions } from './options';
 
-import * as ld from 'launchdarkly-node-server-sdk';
+import { LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
+import { BigSegmentStore, BigSegmentStoreMembership, BigSegmentStoreMetadata }
+  from 'launchdarkly-node-server-sdk/interfaces';
 import { RedisClient } from 'redis';
 import { promisify } from 'util';
 
@@ -19,11 +21,11 @@ export const keyUserExclude = 'big_segment_exclude:';
  *   options for Redis itself and others related to the SDK's behavior.
  */
 export function RedisBigSegmentStore(options?: LDRedisOptions):
-    (config: ld.LDOptions) => ld.interfaces.BigSegmentStore {
+    (config: LDOptions) => BigSegmentStore {
   return (config) => new BigSegmentStoreImpl(options || {}, config.logger);
 }
 
-class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
+class BigSegmentStoreImpl implements BigSegmentStore {
   private state: BaseRedis;
   private client: RedisClient;
   private prefix: string;
@@ -32,7 +34,7 @@ class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
   private clientGet: (key: string) => Promise<string>;
   private clientSmembers: (key: string) => Promise<string[]>;
 
-  public constructor(options: LDRedisOptions, logger: ld.LDLogger) {
+  public constructor(options: LDRedisOptions, logger: LDLogger) {
     this.state = new BaseRedis(options, logger);
     this.client = this.state.client;
     this.prefix = this.state.prefix;
@@ -41,14 +43,14 @@ class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
     this.clientSmembers = promisify(this.client.smembers.bind(this.client));
   }
 
-  public async getMetadata(): Promise<ld.interfaces.BigSegmentStoreMetadata> {
+  public async getMetadata(): Promise<BigSegmentStoreMetadata> {
     const value = await this.clientGet(this.prefix + keyLastUpToDate);
     return {
       lastUpToDate: value === null || value === undefined || value === '' ? undefined : parseInt(value, 10),
     };
   }
 
-  public async getUserMembership(userHash: string): Promise<ld.interfaces.BigSegmentStoreMembership> {
+  public async getUserMembership(userHash: string): Promise<BigSegmentStoreMembership> {
     const includedRefs = await this.clientSmembers(this.prefix + keyUserInclude + userHash);
     const excludedRefs = await this.clientSmembers(this.prefix + keyUserExclude + userHash);
     if ((!includedRefs || !includedRefs.length) && (!excludedRefs || !excludedRefs.length)) {
