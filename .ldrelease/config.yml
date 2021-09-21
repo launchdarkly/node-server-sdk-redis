@@ -1,12 +1,17 @@
+version: 2
+
 publications:
   - url: https://www.npmjs.com/package/launchdarkly-node-server-sdk-redis
     description: npm
 
-template:
-  name: npm
-  skip:
-    - test  # Running the unit tests would require installing Redis. They've already been run in CI.
+jobs:
+  - docker:
+      image: node:12-buster
+    template:
+      name: npm
+      skip:
+        - test  # Running the unit tests would require installing Redis. They've already been run in CI.
 
 documentation:
-  githubPages: true
+  gitHubPages: true
   title: LaunchDarkly Server-Side Node SDK Redis Integration
