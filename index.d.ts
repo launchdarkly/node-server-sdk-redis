@@ -3,7 +3,7 @@
 /**
  * Interface for the Redis feature store component to be used with the LaunchDarkly SDK.
  *
- * See: https://docs.launchdarkly.com/sdk/features/database-integrations
+ * See: https://docs.launchdarkly.com/sdk/features/storing-data/redis#nodejs-server-side
  */
 
 declare module 'launchdarkly-node-server-sdk-redis' {
@@ -15,7 +15,7 @@ declare module 'launchdarkly-node-server-sdk-redis' {
    * Configures a feature store backed by a Redis instance.
    *
    * For more details about how and why you can use a persistent feature store, see
-   * the [SDK features guide](https://docs.launchdarkly.com/sdk/features/database-integrations).
+   * the [Using Redis as a persistent feature store](https://docs.launchdarkly.com/sdk/features/storing-data/redis#nodejs-server-side).
    *
    * For backward compatibility, this function supports both an older syntax that uses multiple
    * parameters and a newer one that uses an [[LDRedisOptions]] object. The newer style is preferred,
@@ -70,7 +70,7 @@ declare module 'launchdarkly-node-server-sdk-redis' {
    * Configures a big segment store backed by a Redis instance.
    * 
    * "Big segments" are a specific type of user segments. For more information, read the
-   * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users
+   * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users/segments
    *
    * @param options The standard options supported for all LaunchDarkly Redis features, including both
    *   options for Redis itself and others related to the SDK's behavior.
