@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [2.1.0] - 2022-12-07
+### Added:
+- Added support for `launchdarkly-node-server-sdk` `7.0.0` and greater.
+
 ## [2.0.0] - 2021-07-22
 ### Added:
 - Added support for Big Segments. An Early Access Program for creating and syncing Big Segments from customer data platforms is available to enterprise customers.
